@@ -2,7 +2,9 @@ package com.kafu.kafu.solution;
 
 import com.kafu.kafu.exception.ApplicationErrorEnum;
 import com.kafu.kafu.exception.BusinessException;
+import com.kafu.kafu.problem.Problem;
 import com.kafu.kafu.problem.ProblemService;
+import com.kafu.kafu.problem.ProblemStatus;
 import com.kafu.kafu.solution.dto.SolutionDTO;
 import com.kafu.kafu.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +36,18 @@ public class SolutionService {
 
     @Transactional
     public Solution create(SolutionDTO solutionDTO) {
+
+        Problem problem = problemService.findById(solutionDTO.getProblemId());
+        if(problem.getStatus() != ProblemStatus.APPROVED || !problem.getForContribution())
+        {
+            throw new RuntimeException("problem not for contribution");
+        }
         Solution solution = new Solution();
         solution.setDescription(solutionDTO.getDescription());
         solution.setEstimatedCost(solutionDTO.getEstimatedCost());
         // Handle relations
         if (solutionDTO.getProblemId() != null) {
-            solution.setProblem(problemService.findById(solutionDTO.getProblemId()));
+            solution.setProblem(problem);
         }
 
         solution.setProposedByUserId(userService.getCurrentUser());
@@ -48,13 +56,18 @@ public class SolutionService {
             solution.setAcceptedByUserId(userService.findById(solutionDTO.getAcceptedByUserId()));
         }
         solution.setStatus(SolutionStatus.PENDING_APPROVAL);
-        SolutionMapper.toEntity(solutionDTO);
+        SolutionMapper.updateEntity(solution,solutionDTO);
         solution = solutionRepository.save(solution);
         return solution;
     }
 
     @Transactional
     public Solution update(Long id, SolutionDTO solutionDTO) {
+        Problem problem = problemService.findById(solutionDTO.getProblemId());
+        if(problem.getStatus() != ProblemStatus.APPROVED || !problem.getForContribution())
+        {
+            throw new RuntimeException("problem not for contribution");
+        }
         Solution solution = findById(id);
         // Handle relations
         if (solutionDTO.getProblemId() != null) {
@@ -73,9 +86,12 @@ public class SolutionService {
 
     @Transactional
     public void delete(Long id) {
-        solutionRepository.findById(id)
+        Solution solution = solutionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ApplicationErrorEnum.SOLUTION_NOT_FOUND));
-        
+        if(solution.getAcceptedReason() !=null || solution.getAcceptedByUserId().getId() != null)
+        {
+            throw new RuntimeException("Cannot delete solution as it is accepted");
+        }
         try {
             solutionRepository.deleteById(id);
         } catch (Exception e) {
