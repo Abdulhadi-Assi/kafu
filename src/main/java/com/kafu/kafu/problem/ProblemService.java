@@ -58,7 +58,7 @@ public class ProblemService {
         problem.setDescription(problemDetailsDTO.getDescription());
         problem.setSubmittedByUser(user);
         problem.setAddress(address);
-        
+
         // Set default values
         problem.setIsReal(false);
         problem.setForContribution(false);
@@ -108,7 +108,7 @@ public class ProblemService {
     public void delete(Long id) {
         problemRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ApplicationErrorEnum.PROBLEM_NOT_FOUND));
-        
+
         try {
             problemRepository.deleteById(id);
         } catch (Exception e) {
@@ -131,9 +131,9 @@ public class ProblemService {
         }
 
         // Handle real fields update
-        if (problemDTO.getIsReal() != null || 
-            problemDTO.getForContribution() != null || 
-            problemDTO.getForDonation() != null) {
+        if (problemDTO.getIsReal() != null ||
+                problemDTO.getForContribution() != null ||
+                problemDTO.getForDonation() != null) {
             handleRealFieldsUpdate(problem, problemDTO);
         }
 
@@ -191,12 +191,18 @@ public class ProblemService {
     }
 
     private void handleRealFieldsUpdate(Problem problem, ProblemDTO problemDTO) {
-        if (problem.getStatus() != ProblemStatus.PENDING_APPROVAL) {
+        if (problem.getStatus() != ProblemStatus.PENDING_APPROVAL ||problem.getStatus() != ProblemStatus.APPROVED ) {
             throw new BusinessException(ApplicationErrorEnum.INVALID_PROBLEM_STATUS);
         }
 
         if (problemDTO.getIsReal() != null) {
             problem.setIsReal(problemDTO.getIsReal());
+            if (problemDTO.getIsReal()) {
+                problem.setStatus(ProblemStatus.APPROVED);
+            } else {
+                problem.setStatus(ProblemStatus.APPROVED);
+            }
+
         }
         if (problemDTO.getForContribution() != null) {
             problem.setForContribution(problemDTO.getForContribution());
