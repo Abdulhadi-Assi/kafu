@@ -3,6 +3,9 @@ package com.kafu.kafu.donation;
 import com.kafu.kafu.payment.PaymentMethod;
 import com.kafu.kafu.payment.PaymentService;
 import com.kafu.kafu.payment.WebhookEvent;
+import com.kafu.kafu.problem.Problem;
+import com.kafu.kafu.problem.ProblemService;
+import com.kafu.kafu.problem.ProblemStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.Map;
@@ -11,10 +14,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentMediator {
     private final DonationService donationService;
+    private final ProblemService problemService;
 
     private final Map<PaymentMethod, PaymentService> paymentServices;
 
     public PaymentSessionResponse initiateDonation(Long problemId , PaymentSessionRequest request) {
+
+        Problem problem = problemService.findById(problemId);
+        if(!problem.getIsReal() || !problem.getForDonation() || problem.getStatus()!= ProblemStatus.IN_PROGRESS)
+        {
+            throw new RuntimeException("this problem is not open for donations");
+        }
 
         PaymentService paymentService = paymentServices.get(request.getPaymentMethod());
         if (paymentService == null) {
