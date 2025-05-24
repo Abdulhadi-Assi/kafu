@@ -2,14 +2,14 @@ package com.kafu.kafu.problemprogress;
 
 import com.kafu.kafu.exception.ApplicationErrorEnum;
 import com.kafu.kafu.exception.BusinessException;
+import com.kafu.kafu.problem.Problem;
 import com.kafu.kafu.problem.ProblemService;
+import com.kafu.kafu.problem.ProblemStatus;
 import com.kafu.kafu.problemprogress.dto.ProblemProgressDTO;
 import com.kafu.kafu.solution.SolutionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,8 +54,14 @@ public class ProblemProgressService {
 
     @Transactional
     public ProblemProgress create(ProblemProgressDTO dto) {
+        Problem problem = problemService.findById(dto.getProblemId());
+        if(problem.getStatus() != ProblemStatus.IN_PROGRESS)
+        {
+            throw new RuntimeException("Problem is not in progress");
+        }
+
         ProblemProgress progress = new ProblemProgress();
-        progress.setProblem(problemService.findById(dto.getProblemId()));
+        progress.setProblem(problem);
         progress.setSolution(solutionService.findById(dto.getSolutionId()));
         progress.setPercentage(dto.getPercentage());
         progress.setComment(dto.getComment());
