@@ -28,7 +28,7 @@ public class Donation {
     private BigDecimal amount;
 
     @Column(nullable = false, length = 3)
-    private String currency = "USD";
+    private String currency = "LBP";
 
     @Column(name = "payment_method", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)

@@ -203,9 +203,6 @@ public class ProblemService {
     }
 
     private void handleDetailsUpdate(Problem problem, ProblemDTO problemDTO) {
-        if (problem.getStatus() != ProblemStatus.PENDING_APPROVAL) {
-            throw new BusinessException(ApplicationErrorEnum.INVALID_PROBLEM_STATUS);
-        }
 
         if (problemDTO.getTitle() != null) {
             problem.setTitle(problemDTO.getTitle());
