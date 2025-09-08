@@ -22,4 +22,5 @@ public class ProblemSearchCriteria {
     // Add new fields for gov search
     private Long govId;
     private String govName;
+    private Boolean isReal;
 }

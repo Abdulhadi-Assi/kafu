@@ -58,6 +58,9 @@ public class ProblemSpecification {
                     cb.like(cb.lower(govJoin.get("name")), searchPattern)
                 );
             }
+            if (criteria.getIsReal() != null) {
+                predicate = cb.and(predicate, cb.equal(root.get("isReal"), criteria.getIsReal()));
+            }
 
             return predicate;
         };
