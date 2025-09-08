@@ -26,11 +26,11 @@ public class ProblemDTO {
     @NotBlank(message = "Description is required")
     private String description;
 
-    private Boolean isReal = false;
+    private Boolean isReal;
 
-    private Boolean forContribution = false;
+    private Boolean forContribution;
 
-    private Boolean forDonation = false;
+    private Boolean forDonation;
 
     private LocalDateTime submissionDate;
 
