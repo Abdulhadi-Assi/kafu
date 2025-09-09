@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProblemRepository extends JpaRepository<Problem, Long>, JpaSpecificationExecutor<Problem> {
     
-    @Query("SELECT p FROM Problem p WHERE p.isReal = true AND p.status != 'PENDING_APPROVAL'")
+    @Query("SELECT p FROM Problem p WHERE p.isReal = true AND p.status != 'PENDING_APPROVAL' AND p.status != 'REJECTED'")
     Page<Problem> findRealProblemsNotPendingApproval(Pageable pageable);
 }
