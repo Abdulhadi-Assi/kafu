@@ -81,6 +81,14 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{userId}/remove-role")
+    public ResponseEntity<Void> removeUserRole(
+            @PathVariable Long userId,
+            @RequestParam String role) {
+        userService.removeUserRoleByUserId(userId, role);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
         return ResponseEntity.ok(userService.findAll());

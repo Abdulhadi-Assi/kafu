@@ -213,8 +213,44 @@ public class UserService {
                 }
             }
         }
+    }
 
+    /**
+     * Remove a role from a user in Keycloak for both spring-client and react-client.
+     * If the user doesn't have the role, do nothing.
+     * @param userId the database user ID
+     * @param role the role to remove (e.g., "gov" or "admin")
+     */
+    public void removeUserRoleByUserId(Long userId, String role) {
+        User user = findById(userId);
+        String keycloakUserId = user.getKeycloakId();
 
+        RealmResource realmResource = keycloak.realm(realm);
+        UsersResource usersResource = realmResource.users();
+        UserResource userResource = usersResource.get(keycloakUserId);
+
+        for (String clientId : List.of("spring-client", "react-client")) {
+            var clients = realmResource.clients().findByClientId(clientId);
+            if (clients.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Keycloak client '" + clientId + "' does not exist in realm: " + realm);
+            }
+            String clientUuid = clients.get(0).getId();
+
+            // Get current client roles
+            List<RoleRepresentation> currentRoles = userResource.roles().clientLevel(clientUuid).listAll();
+            boolean hasRole = currentRoles.stream().anyMatch(r -> r.getName().equals(role));
+            if (hasRole) {
+                // Remove the role
+                try {
+                    RoleRepresentation roleToRemove = realmResource.clients().get(clientUuid)
+                            .roles().get(role).toRepresentation();
+                    userResource.roles().clientLevel(clientUuid).remove(List.of(roleToRemove));
+                } catch (Exception e) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role '" + role + "' does not exist in Keycloak client: " + clientId);
+                }
+            }
+        }
     }
 
     public List<UserDTO> findAll() {
