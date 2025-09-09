@@ -228,4 +228,8 @@ public class ProblemService {
         return problemRepository.findAll(spec, pageable);
 
     }
+
+    public Page<Problem> findRealProblemsNotPendingApproval(Pageable pageable) {
+        return problemRepository.findRealProblemsNotPendingApproval(pageable);
+    }
 }

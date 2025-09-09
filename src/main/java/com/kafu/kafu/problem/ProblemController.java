@@ -53,4 +53,11 @@ public class ProblemController {
         return ResponseEntity.ok(problemService.searchUserProblems(criteria, pageable)
                 .map(ProblemMapper::toDTO));
     }
+
+    @GetMapping("/real")
+    public ResponseEntity<Page<ProblemDTO>> findRealProblemsNotPendingApproval(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(problemService.findRealProblemsNotPendingApproval(pageable)
+                .map(ProblemMapper::toDTO));
+    }
 }
