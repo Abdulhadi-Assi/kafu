@@ -28,7 +28,7 @@ public class DonationDTO {
     private BigDecimal amount;
 
     @NotBlank(message = "Currency is required")
-    private String currency = "LBP";
+    private String currency = "USD";
 
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;

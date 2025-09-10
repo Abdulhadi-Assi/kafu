@@ -60,7 +60,7 @@ public class ProblemService {
         problem.setAddress(address);
         
         // Set default values
-        problem.setIsReal(false);
+        problem.setIsReal(true);
         problem.setForContribution(false);
         problem.setForDonation(false);
         problem.setSubmissionDate(LocalDateTime.now());
